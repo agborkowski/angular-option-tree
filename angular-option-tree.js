@@ -33,9 +33,9 @@
     function ($http, $log) {
       return {
         restrict: 'AC',
-        require: 'ngModel',
+        //require: 'ngModel',
         scope: {
-          ngModel: '=',
+          //ngModel: '=',
           onChooseFn: '&',
           onChangeFn: '&'
           // options: '=?',
@@ -82,14 +82,14 @@
               });
 
             if (selected > 0) {
-              if (angular.isDefined(scope.ngModel)) {
-                model = scope.ngModel;
-              }
+              // if (angular.isDefined(scope.ngModel)) {
+              //   model = scope.ngModel;
+              // }
 
-              $log.info('bind_on_change', selected, labels);
+              //$log.info('bind_on_change', selected, labels);
               if (angular.isFunction(scope.onChangeFn)) {
                 return scope.onChangeFn({
-                  model: model,
+                  //model: model,
                   name: labels[labels.length - 1],
                   selected: selected,
                   labels: labels,
@@ -100,9 +100,14 @@
           };
 
           function bind_on_choose(level) {
-            if(angular.isFunction(scope.onChooseFn)) {
-              $log.info('bind_on_choose', level, $(this).val());
-              return scope.onChooseFn({self: this, level: level, selectedCategory: $(this).val()});
+            //console.log(scope.onChooseFn);
+            if(angular.isDefined(scope.onChooseFn)) {
+              //$log.info('bind_on_choose', level, $(this).val());
+              return scope.onChooseFn({
+                level: level,
+                selected: $(this).val(),
+                prompt: $(element).attr('option-tree-prompt')
+              });
             } else {
               return $(element).attr('option-tree-prompt');
             }
@@ -117,19 +122,17 @@
               isInit = true;
             }
             //refresh_preselect(option_tree); @fix it when childrens are loaded dynamicly
-            $log.info('bind_option_tree');
+            //$log.info('bind_option_tree');
             $(element_query_pattern).optionTree(option_tree, settings).change(bind_on_change);
           };
-
-          //scope.$watch(attrs.optionTree, function (option_tree) {
-            //bind_option_tree(option_tree);
-          //});
           
           // Loading Remote Data
           if ($(element).attr('option-tree-src')) {
             $http.get($(element).attr('option-tree-src')).success(function (data) {
               bind_option_tree(data);
             });
+          } else {
+            bind_option_tree(attrs.optionTree);
           }
         }
       };
